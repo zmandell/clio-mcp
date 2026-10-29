@@ -18,6 +18,7 @@ import type { ClioTokens } from "../auth/oauth.js";
 import { sessionStorage, SessionContext, PendingBrokerSession } from "../utils/sessionContext.js";
 import { appendAuditLog } from "../utils/auditLog.js";
 import { createApiKeyMiddleware, resolveHttpAuthConfig, PUBLIC_PATHS } from "./httpAuth.js";
+import { createRequestLogMiddleware } from "./requestLog.js";
 import type { HttpAuthConfig } from "./httpAuth.js";
 
 const pkg = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8"));
@@ -156,6 +157,7 @@ setInterval(() => {
 export function createApp(auth: HttpAuthConfig, opts: HttpServerOptions = {}): express.Express {
   const app = express();
 
+  app.use(createRequestLogMiddleware());
   app.use(createApiKeyMiddleware(auth));
 
   app.get("/health", (_req, res) => {
